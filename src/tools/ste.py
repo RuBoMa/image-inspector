@@ -11,7 +11,7 @@ def extract_lsb_variants(image_path, bit_position=0):
     img = Image.open(image_path).convert("RGB")
     arr = np.array(img)
 
-    # DRY: define channel selectors
+    # Prepare channel variants so we can detect per-channel embeddings.
     channels = {
         "interleaved": arr.reshape(-1),
         "red_only": arr[:, :, 0].reshape(-1),
@@ -22,6 +22,7 @@ def extract_lsb_variants(image_path, bit_position=0):
     results = {}
 
     for name, pixels in channels.items():
+        # Extract the target bit and pack into bytes for scanning.
         bits = (pixels >> bit_position) & 1
         results[name] = np.packbits(bits).tobytes()
 

@@ -29,14 +29,14 @@ def discover_pgp(image_path):
 
     found = set()
 
-    # --- 1. Raw file scan ---
+    # Scan raw bytes for a literal PGP block in the file.
     with open(image_path, "rb") as f:
         raw_data = f.read()
         matches = pgp_pattern.findall(raw_data)
         for match in matches:
             found.add(match.decode("utf-8", errors="ignore"))
 
-    # --- 2. LSB scan ---
+    # Scan extracted LSB variants for embedded PGP blocks.
     variants = extract_lsb_variants(image_path)
     for data in variants.values():
         matches = pgp_pattern.findall(data)
@@ -61,7 +61,7 @@ def handle_metadata(path):
 
     return report
 
-
+# For simplicity, we just return the PGP blocks as text.
 def handle_steganography(path):
     pgp_blocks = discover_pgp(path)
 
