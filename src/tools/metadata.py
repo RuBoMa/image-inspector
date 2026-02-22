@@ -2,16 +2,29 @@ import math
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 
+def handle_metadata(path):
+    exif = get_exif_data(path)
+    gps = get_gps_data(exif)
+
+    report = format_exif(exif)
+
+    if gps:
+        report += (
+            f"\n\nGPS Data:\n"
+            f"Latitude: {gps['latitude']}\n"
+            f"Longitude: {gps['longitude']}"
+        )
+
+    return report
 
 def get_exif_data(image_path):
     with Image.open(image_path) as image:
         return image.getexif()
 
-
 def get_gps_data(exif_data):
     if not exif_data:
         return {}
-
+    # GPS data is stored in a separate IFD (Image File Directory) with tag 0x8825
     gps_ifd = exif_data.get_ifd(0x8825)
     if not gps_ifd:
         return {}
